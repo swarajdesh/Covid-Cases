@@ -1,28 +1,40 @@
 package com.example.covidcases;
 
+import java.util.Date;
+import java.util.List;
+
 public class CovidData {
 
-    private String date;
 
-    private int dailyconfirmed;
+    private Date lastUpdatedAtApify;
+    private int activeCases;
+    private int recovered;
+    private int deaths;
+    private int totalCases;
+    private StatesData statesData;
 
-    private int dailydeceased;
-
-    private  int dailyrecovered;
-
-    public String getDate() {
-        return date;
+    public Date getLastUpdatedAtApify() {
+        return lastUpdatedAtApify;
     }
 
-    public int getDailyconfirmed() {
-        return dailyconfirmed;
+    public int getActiveCases() {
+        return activeCases;
     }
 
-    public int getDailydeceased() {
-        return dailydeceased;
+    public int getRecovered() {
+        return recovered;
     }
 
-    public int getDailyrecovered() {
-        return dailyrecovered;
+    public int getDeaths() {
+        return deaths;
+    }
+
+    public int getTotalCases() {
+        return totalCases;
+    }
+
+    public StatesData getStatesData() {
+        return statesData;
     }
 }
+
