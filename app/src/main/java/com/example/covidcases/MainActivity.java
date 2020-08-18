@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
+        Gson gson = new GsonBuilder().registerTypeAdapter(StatesData.class,new MyDeserializer()).setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         Retrofit retrofit = new Retrofit.Builder()
                  .baseUrl(URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity {
                // Collections.reverse(nationalData);
                nationalDailyData = nationalData;
                 Log.i(TAG,"Update graph");
-
             }
 
             @Override
