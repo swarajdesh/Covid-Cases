@@ -16,6 +16,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.robinhood.spark.SparkView;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -30,12 +31,17 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
-
+/**
+ * Author:    Swaraj Deshmukh
+ * Created:   15.08.2020
+ *
+ **/
 
 public class MainActivity extends AppCompatActivity {
     private static final String URL = "https://api.apify.com/v2/datasets/";
     private static final String TAG = "MainActivity";
     private List<CovidData> nationalDailyData;
+    private CovidSparkViewAdap adapter;
     TextView tvMatric,tvDate;
     RadioButton RadiobtnMax,RadiobtnMonth,RadiobtnWeek,RadiobtnNegative,RadiobtnPositive,RadiobtnDeaths;
     RadioGroup radioGroupMetricSelection,radioGroupTimeSelection;
@@ -55,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
         radioGroupTimeSelection = findViewById(R.id.radioGroupTimeSelection);
 
         sparkView = findViewById(R.id.sparkView);
+        sparkView.setScrubEnabled(true);
 
         Gson gson = new GsonBuilder().registerTypeAdapter(StatesData.class,new MyDeserializer()).setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         Retrofit retrofit = new Retrofit.Builder()
@@ -78,11 +85,10 @@ public class MainActivity extends AppCompatActivity {
                 if (!response.isSuccessful()){
                     Log.w(TAG,"Did not recieve valid  response");
                 }
-
                 List<CovidData> nationalData = response.body();
 
+                RadiobtnListeners();
                // Collections.reverse(nationalData);
-               nationalDailyData = nationalData;
                updateDisplayData(nationalData);
                 Log.i(TAG,"Update graph");
             }
@@ -96,6 +102,49 @@ public class MainActivity extends AppCompatActivity {
 
 
 
+    }
+
+    private void RadiobtnListeners() {
+    //Scrub effect of graph spark
+
+        sparkView.isScrubEnabled();
+        sparkView.setScrubListener(new SparkView.OnScrubListener() {
+            @Override
+            public void onScrubbed(Object value) {
+//                if(value.equals(nationalDailyData))
+//                    updateDisplayData(value);
+            }
+        });
+
+    }
+
+    private void updateDisplayData(List<CovidData> CovidData) {
+
+        //Create a SparkAdapter with the data
+        adapter = new CovidSparkViewAdap(CovidData);
+        sparkView.setAdapter(adapter);
+        //Dafault checked of radio buttons
+      radioGroupMetricSelection.check(R.id.radioButtonPositive);
+      radioGroupTimeSelection.check(R.id.radioButtonMax);
+       //Updating TextView of date and total cases method
+     updateTextView(CovidData.get(CovidData.size()-1));
+    }
+
+    private void updateTextView(CovidData covidData) {
+        float Cases = 0;
+
+        //TextView number changes according to the radio button selected
+        if (adapter.Graph==GraphCovid.Positive) Cases = covidData.getActiveCases();
+        if (adapter.Graph==GraphCovid.Negative) Cases = covidData.getRecovered();
+        if (adapter.Graph==GraphCovid.Death) Cases = covidData.getDeaths();
+        tvMatric.setText(String.valueOf(NumberFormat.getInstance().format(Cases)));
+        SimpleDateFormat DateFormat = new SimpleDateFormat("MMM dd,YYYY", Locale.ENGLISH);
+        tvDate.setText(DateFormat.format(covidData.getLastUpdatedAtApify()));
+
+    }
+
+
+}
 
 //        Call<Cases_time_series> call = covidService.getIndianData();
 //        call.enqueue(new Callback<Cases_time_series>() {
@@ -120,32 +169,4 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-        //fetch states cases
-
-    }
-
-    private void updateDisplayData(List<CovidData> CovidData) {
-
-        //Create a SparkAdapter with the data
-        CovidSparkViewAdap adapter = new CovidSparkViewAdap(CovidData);
-        sparkView.setAdapter(adapter);
-
-
-
-        //Dafault checked of radio buttons
-      radioGroupMetricSelection.check(R.id.radioButtonPositive);
-      radioGroupTimeSelection.check(R.id.radioButtonMax);
-       //Updating TextView of date and total cases method
-     updateTextView(CovidData.get(CovidData.size()-1));
-    }
-
-    private void updateTextView(CovidData covidData) {
-
-        tvMatric.setText(String.valueOf(covidData.getActiveCases()));
-        SimpleDateFormat DateFormat = new SimpleDateFormat("MMM dd,YYYY", Locale.ENGLISH);
-        tvDate.setText(DateFormat.format(covidData.getLastUpdatedAtApify()));
-
-    }
-
-
-}
+//fetch states cases
