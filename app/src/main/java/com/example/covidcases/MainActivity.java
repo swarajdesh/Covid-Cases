@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.robinhood.spark.SparkView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
     TextView tvMatric,tvDate;
     RadioButton RadiobtnMax,RadiobtnMonth,RadiobtnWeek,RadiobtnNegative,RadiobtnPositive,RadiobtnDeaths;
     RadioGroup radioGroupMetricSelection,radioGroupTimeSelection;
+    SparkView sparkView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
         radioGroupMetricSelection = findViewById(R.id.radioGroupMetricSelection);
         radioGroupTimeSelection = findViewById(R.id.radioGroupTimeSelection);
 
-
+        sparkView = findViewById(R.id.sparkView);
 
         Gson gson = new GsonBuilder().registerTypeAdapter(StatesData.class,new MyDeserializer()).setDateFormat("yyyy-MM-dd'T'HH:mm:ss").create();
         Retrofit retrofit = new Retrofit.Builder()
@@ -125,7 +127,8 @@ public class MainActivity extends AppCompatActivity {
     private void updateDisplayData(List<CovidData> CovidData) {
 
         //Create a SparkAdapter with the data
-        Object adapter = CovidSparkViewAdap(CovidData);
+        CovidSparkViewAdap adapter = new CovidSparkViewAdap(CovidData);
+        sparkView.setAdapter(adapter);
 
 
 
